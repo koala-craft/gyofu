@@ -10,8 +10,8 @@ class MainScaffold extends StatelessWidget {
     final location = GoRouterState.of(context).uri.toString();
 
     if (location.startsWith('/port-registration')) return 2;
-    if (location.startsWith('/regional-fish-registration')) return 1;
-    // デフォルトは魚名変換ページ
+    if (location.startsWith('/fish-convert')) return 1;
+    // デフォルトは地域の魚情報ページ
     return 0;
   }
 
@@ -21,7 +21,7 @@ class MainScaffold extends StatelessWidget {
         context.go('/');
         break;
       case 1:
-        context.go('/regional-fish-registration');
+        context.go('/fish-convert');
         break;
       case 2:
         context.go('/port-registration');
@@ -43,12 +43,12 @@ class MainScaffold extends StatelessWidget {
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.swap_horiz),
-            label: '変換',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.set_meal),
             label: '魚の登録',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.swap_horiz),
+            label: '変換',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.location_on_rounded),

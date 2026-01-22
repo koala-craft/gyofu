@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:gyofu/pages/fish_convert_page.dart';
 import 'package:gyofu/pages/port_registration_page.dart';
+import 'package:gyofu/pages/regional_fish_list_page.dart';
+import 'package:gyofu/pages/regional_fish_detail_page.dart';
 import 'package:gyofu/pages/regional_fish_registration_page.dart';
 import 'package:gyofu/second_page.dart';
 import 'package:gyofu/app/main_scaffold.dart';
@@ -15,6 +17,10 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: '/',
+          builder: (context, state) => const RegionalFishListPage(),
+        ),
+        GoRoute(
+          path: '/fish-convert',
           builder: (context, state) => const FishConvertPage(),
         ),
         GoRoute(
@@ -26,7 +32,14 @@ final router = GoRouter(
           builder: (context, state) => const PortRegistrationPage(),
         ),
         GoRoute(
-          path: '/regional-fish-registration',
+          path: '/regional-fish-detail/:id',
+          builder: (context, state) {
+            final id = state.pathParameters['id'] ?? '';
+            return RegionalFishDetailPage(fishId: id);
+          },
+        ),
+        GoRoute(
+          path: '/regional-fish-edit',
           builder: (context, state) => const RegionalFishRegistrationPage(),
         ),
       ],

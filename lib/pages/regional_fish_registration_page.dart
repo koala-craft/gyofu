@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class RegionalFishRegistrationPage extends StatefulWidget {
   const RegionalFishRegistrationPage({super.key});
@@ -118,30 +119,48 @@ class _RegionalFishRegistrationPageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ヘッダー
-              Column(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '地域の魚名登録',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.5,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
-                      height: 1.2,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '地域の魚名登録',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.5,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '地域ごとの魚のローカル名と正式名称を登録します',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: isDark
+                                ? Colors.white70
+                                : const Color(0xFF64748B),
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '地域ごとの魚のローカル名と正式名称を登録します',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: isDark
-                          ? Colors.white70
-                          : const Color(0xFF64748B),
-                      letterSpacing: 0.2,
+                  // ×ボタン
+                  IconButton(
+                    onPressed: () => context.pop(),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      size: 28,
                     ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
