@@ -9,8 +9,9 @@ class MainScaffold extends StatelessWidget {
   int _locationToIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
 
-    if (location.startsWith('/history')) return 1;
-    if (location.startsWith('/settings')) return 2;
+    if (location.startsWith('/port-registration')) return 2;
+    if (location.startsWith('/regional-fish-registration')) return 1;
+    // デフォルトは魚名変換ページ
     return 0;
   }
 
@@ -20,10 +21,10 @@ class MainScaffold extends StatelessWidget {
         context.go('/');
         break;
       case 1:
-        context.go('/history');
+        context.go('/regional-fish-registration');
         break;
       case 2:
-        context.go('/settings');
+        context.go('/port-registration');
         break;
     }
   }
@@ -41,10 +42,18 @@ class MainScaffold extends StatelessWidget {
         selectedItemColor: const Color(0xFF1E88E5),
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.swap_horiz), label: '変換'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: '履歴'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: '履歴'),
-          // BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.swap_horiz),
+            label: '変換',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.set_meal),
+            label: '魚の登録',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on_rounded),
+            label: '漁港登録',
+          ),
         ],
       ),
     );

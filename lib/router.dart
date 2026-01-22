@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:gyofu/pages/fish_convert_page.dart';
+import 'package:gyofu/pages/port_registration_page.dart';
+import 'package:gyofu/pages/regional_fish_registration_page.dart';
 import 'package:gyofu/second_page.dart';
 import 'package:gyofu/app/main_scaffold.dart';
 
@@ -18,6 +20,14 @@ final router = GoRouter(
         GoRoute(
           path: '/second',
           builder: (context, state) => const SecondPage(),
+        ),
+        GoRoute(
+          path: '/port-registration',
+          builder: (context, state) => const PortRegistrationPage(),
+        ),
+        GoRoute(
+          path: '/regional-fish-registration',
+          builder: (context, state) => const RegionalFishRegistrationPage(),
         ),
       ],
     ),
