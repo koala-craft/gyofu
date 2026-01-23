@@ -3,12 +3,19 @@ import 'package:gyofu/pages/fish_convert_page.dart';
 import 'package:gyofu/pages/regional_fish_list_page.dart';
 import 'package:gyofu/pages/regional_fish_detail_page.dart';
 import 'package:gyofu/pages/regional_fish_registration_page.dart';
+import 'package:gyofu/pages/splash_page.dart';
 import 'package:gyofu/second_page.dart';
 import 'package:gyofu/app/main_scaffold.dart';
 
 final router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/splash',
   routes: [
+    // スプラッシュ画面（ナビゲーションバーなし）
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashPage(),
+    ),
+    // メイン画面（ナビゲーションバーあり）
     ShellRoute(
       builder: (context, state, child) {
         return MainScaffold(child: child);
