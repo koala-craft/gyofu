@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gyofu/data/prefecture_data.dart';
+import 'package:gyofu/data/city_port_data.dart';
 
 class PortRegistrationPage extends StatefulWidget {
   const PortRegistrationPage({super.key});
@@ -9,11 +11,12 @@ class PortRegistrationPage extends StatefulWidget {
 
 class _PortRegistrationPageState extends State<PortRegistrationPage> {
   final TextEditingController _portNameController = TextEditingController();
-  final TextEditingController _prefectureController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
+  String? _selectedPrefecture;
+  String? _selectedCity;
+  String? _selectedPort;
   bool _isSubmitting = false;
 
   String? _safeGetText(TextEditingController? controller) {
@@ -28,15 +31,13 @@ class _PortRegistrationPageState extends State<PortRegistrationPage> {
 
   bool _validateForm() {
     final portName = _safeGetText(_portNameController);
-    final prefecture = _safeGetText(_prefectureController);
-    final city = _safeGetText(_cityController);
 
     return portName != null &&
         portName.isNotEmpty &&
-        prefecture != null &&
-        prefecture.isNotEmpty &&
-        city != null &&
-        city.isNotEmpty;
+        _selectedPrefecture != null &&
+        _selectedPrefecture!.isNotEmpty &&
+        _selectedCity != null &&
+        _selectedCity!.isNotEmpty;
   }
 
   void _submitForm() {
@@ -60,8 +61,11 @@ class _PortRegistrationPageState extends State<PortRegistrationPage> {
         );
         // フォームをクリア
         _portNameController.clear();
-        _prefectureController.clear();
-        _cityController.clear();
+        setState(() {
+          _selectedPrefecture = null;
+          _selectedCity = null;
+          _selectedPort = null;
+        });
         _addressController.clear();
         _descriptionController.clear();
       }
@@ -71,8 +75,6 @@ class _PortRegistrationPageState extends State<PortRegistrationPage> {
   @override
   void dispose() {
     _portNameController.dispose();
-    _prefectureController.dispose();
-    _cityController.dispose();
     _addressController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -259,17 +261,11 @@ class _PortRegistrationPageState extends State<PortRegistrationPage> {
                     const SizedBox(height: 16),
 
                     // 県名（必須）
-                    TextField(
-                      controller: _prefectureController,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.5,
-                      ),
+                    DropdownButtonFormField<String>(
+                      value: _selectedPrefecture,
                       decoration: InputDecoration(
                         labelText: '県名 *',
-                        hintText: '例：福岡県',
+                        hintText: '都道府県を選択',
                         hintStyle: TextStyle(
                           color: isDark
                               ? Colors.white38
@@ -313,21 +309,45 @@ class _PortRegistrationPageState extends State<PortRegistrationPage> {
                           vertical: 18,
                         ),
                       ),
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
+                      dropdownColor: isDark
+                          ? const Color(0xFF1E293B)
+                          : Colors.white,
+                      iconEnabledColor: isDark
+                          ? Colors.white70
+                          : const Color(0xFF64748B),
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('選択してください'),
+                        ),
+                        ...prefectureList.map((String prefecture) {
+                          return DropdownMenuItem<String>(
+                            value: prefecture,
+                            child: Text(prefecture),
+                          );
+                        }),
+                      ],
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedPrefecture = value;
+                          _selectedCity = null; // 県名が変わったら市区町村をリセット
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
 
                     // 市区町村名（必須）
-                    TextField(
-                      controller: _cityController,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.5,
-                      ),
+                    DropdownButtonFormField<String>(
+                      value: _selectedCity,
                       decoration: InputDecoration(
                         labelText: '市区町村名 *',
-                        hintText: '例：福岡市',
+                        hintText: '市区町村を選択',
                         hintStyle: TextStyle(
                           color: isDark
                               ? Colors.white38
@@ -371,6 +391,38 @@ class _PortRegistrationPageState extends State<PortRegistrationPage> {
                           vertical: 18,
                         ),
                       ),
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
+                      dropdownColor: isDark
+                          ? const Color(0xFF1E293B)
+                          : Colors.white,
+                      iconEnabledColor: isDark
+                          ? Colors.white70
+                          : const Color(0xFF64748B),
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('選択してください'),
+                        ),
+                        ...getCitiesByPrefecture(_selectedPrefecture)
+                            .map((String city) {
+                          return DropdownMenuItem<String>(
+                            value: city,
+                            child: Text(city),
+                          );
+                        }),
+                      ],
+                      onChanged: _selectedPrefecture == null
+                          ? null
+                          : (String? value) {
+                              setState(() {
+                                _selectedCity = value;
+                              });
+                            },
                     ),
                     const SizedBox(height: 16),
 

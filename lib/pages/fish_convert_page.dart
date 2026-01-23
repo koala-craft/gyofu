@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gyofu/data/fish_repository.dart';
+import 'package:gyofu/data/prefecture_data.dart';
+import 'package:gyofu/data/city_port_data.dart';
 
 class FishConvertPage extends StatefulWidget {
   const FishConvertPage({super.key});
@@ -11,14 +13,15 @@ class FishConvertPage extends StatefulWidget {
 class _FishConvertPageState extends State<FishConvertPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _fishNameController = TextEditingController();
-  final TextEditingController _prefectureController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _portController = TextEditingController();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
+  String? _selectedPrefecture;
+  String? _selectedCity;
+  String? _selectedPort;
   String _inputText = '';
   String _result = '';
+  bool _isRegionExpanded = false; // 地域情報の折りたたみ状態
   final repo = FishRepository();
 
   @override
@@ -37,9 +40,6 @@ class _FishConvertPageState extends State<FishConvertPage>
   @override
   void dispose() {
     _fishNameController.dispose();
-    _prefectureController.dispose();
-    _cityController.dispose();
-    _portController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -63,20 +63,17 @@ class _FishConvertPageState extends State<FishConvertPage>
       if (fishName == null || fishName.isEmpty) return;
 
       // 県名・市区町村名・漁港名はオプションなので、空文字列の場合はnullにする
-      final prefectureText = _safeGetText(_prefectureController);
-      final prefecture = (prefectureText == null || prefectureText.isEmpty) 
+      final prefecture = (_selectedPrefecture == null || _selectedPrefecture!.isEmpty) 
           ? null 
-          : prefectureText;
+          : _selectedPrefecture;
       
-      final cityText = _safeGetText(_cityController);
-      final city = (cityText == null || cityText.isEmpty) 
+      final city = (_selectedCity == null || _selectedCity!.isEmpty) 
           ? null 
-          : cityText;
+          : _selectedCity;
       
-      final portText = _safeGetText(_portController);
-      final port = (portText == null || portText.isEmpty) 
+      final port = (_selectedPort == null || _selectedPort!.isEmpty) 
           ? null 
-          : portText;
+          : _selectedPort;
 
       if (!mounted) return;
       
@@ -306,178 +303,314 @@ class _FishConvertPageState extends State<FishConvertPage>
                         onSubmitted: (_) => _convertFishName(),
                       ),
                       const SizedBox(height: 16),
-                      // 県名入力
-                      TextField(
-                        controller: _prefectureController,
-                        style: TextStyle(
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
+                      // 地域情報の折りたたみセクション
+                      Theme(
+                        data: Theme.of(context).copyWith(
+                          dividerColor: Colors.transparent,
                         ),
-                        decoration: InputDecoration(
-                          labelText: '県名',
-                          hintText: '例：福岡県',
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white38
-                                : const Color(0xFF94A3B8),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
+                        child: ExpansionTile(
+                          tilePadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                          labelStyle: TextStyle(
+                          childrenPadding: EdgeInsets.zero,
+                          title: Text(
+                            '地域情報（任意）',
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.white70
+                                  : const Color(0xFF64748B),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              _isRegionExpanded 
+                                  ? '地域を指定して検索精度を上げる' 
+                                  : _selectedPrefecture != null || _selectedCity != null || _selectedPort != null
+                                      ? '${_selectedPrefecture ?? ''}${_selectedCity != null ? ' / ${_selectedCity}' : ''}${_selectedPort != null ? ' / ${_selectedPort}' : ''}'
+                                      : 'タップして地域を選択',
+                              style: TextStyle(
+                                color: isDark
+                                    ? Colors.white38
+                                    : const Color(0xFF94A3B8),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          trailing: Icon(
+                            _isRegionExpanded 
+                                ? Icons.expand_less 
+                                : Icons.expand_more,
                             color: isDark
                                 ? Colors.white70
                                 : const Color(0xFF64748B),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
                           ),
-                          filled: true,
-                          fillColor: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : const Color(0xFFF8FAFC),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.1)
-                                  : const Color(0xFFE2E8F0),
-                              width: 1.5,
+                          onExpansionChanged: (bool expanded) {
+                            setState(() {
+                              _isRegionExpanded = expanded;
+                            });
+                          },
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                              child: Column(
+                                children: [
+                                  // 県名入力
+                                  DropdownButtonFormField<String>(
+                                    value: _selectedPrefecture,
+                                    decoration: InputDecoration(
+                                      labelText: '県名',
+                                      hintText: '都道府県を選択',
+                                      hintStyle: TextStyle(
+                                        color: isDark
+                                            ? Colors.white38
+                                            : const Color(0xFF94A3B8),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: isDark
+                                            ? Colors.white70
+                                            : const Color(0xFF64748B),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      filled: true,
+                                      fillColor: isDark
+                                          ? Colors.white.withOpacity(0.05)
+                                          : const Color(0xFFF8FAFC),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.1)
+                                              : const Color(0xFFE2E8F0),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFF3B82F6),
+                                          width: 2,
+                                        ),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 18,
+                                      ),
+                                    ),
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.5,
+                                    ),
+                                    dropdownColor: isDark
+                                        ? const Color(0xFF1E293B)
+                                        : Colors.white,
+                                    iconEnabledColor: isDark
+                                        ? Colors.white70
+                                        : const Color(0xFF64748B),
+                                    items: [
+                                      const DropdownMenuItem<String>(
+                                        value: null,
+                                        child: Text('選択してください'),
+                                      ),
+                                      ...getPrefecturesFromMock().map((String prefecture) {
+                                        return DropdownMenuItem<String>(
+                                          value: prefecture,
+                                          child: Text(prefecture),
+                                        );
+                                      }),
+                                    ],
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        _selectedPrefecture = value;
+                                        _selectedCity = null; // 県名が変わったら市区町村をリセット
+                                        _selectedPort = null; // 県名が変わったら漁港名をリセット
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // 市区町村名入力
+                                  DropdownButtonFormField<String>(
+                                    value: _selectedCity,
+                                    decoration: InputDecoration(
+                                      labelText: '市区町村名',
+                                      hintText: '市区町村を選択',
+                                      hintStyle: TextStyle(
+                                        color: isDark
+                                            ? Colors.white38
+                                            : const Color(0xFF94A3B8),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: isDark
+                                            ? Colors.white70
+                                            : const Color(0xFF64748B),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      filled: true,
+                                      fillColor: isDark
+                                          ? Colors.white.withOpacity(0.05)
+                                          : const Color(0xFFF8FAFC),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.1)
+                                              : const Color(0xFFE2E8F0),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFF3B82F6),
+                                          width: 2,
+                                        ),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 18,
+                                      ),
+                                    ),
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.5,
+                                    ),
+                                    dropdownColor: isDark
+                                        ? const Color(0xFF1E293B)
+                                        : Colors.white,
+                                    iconEnabledColor: isDark
+                                        ? Colors.white70
+                                        : const Color(0xFF64748B),
+                                    items: [
+                                      const DropdownMenuItem<String>(
+                                        value: null,
+                                        child: Text('選択してください'),
+                                      ),
+                                      ...getCitiesByPrefecture(_selectedPrefecture)
+                                          .map((String city) {
+                                        return DropdownMenuItem<String>(
+                                          value: city,
+                                          child: Text(city),
+                                        );
+                                      }),
+                                    ],
+                                    onChanged: _selectedPrefecture == null
+                                        ? null
+                                        : (String? value) {
+                                            setState(() {
+                                              _selectedCity = value;
+                                              _selectedPort = null; // 市区町村が変わったら漁港名をリセット
+                                            });
+                                          },
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // 漁港名入力
+                                  DropdownButtonFormField<String>(
+                                    value: _selectedPort,
+                                    decoration: InputDecoration(
+                                      labelText: '漁港名',
+                                      hintText: '漁港を選択',
+                                      hintStyle: TextStyle(
+                                        color: isDark
+                                            ? Colors.white38
+                                            : const Color(0xFF94A3B8),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: isDark
+                                            ? Colors.white70
+                                            : const Color(0xFF64748B),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      filled: true,
+                                      fillColor: isDark
+                                          ? Colors.white.withOpacity(0.05)
+                                          : const Color(0xFFF8FAFC),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.1)
+                                              : const Color(0xFFE2E8F0),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(
+                                          color: Color(0xFF3B82F6),
+                                          width: 2,
+                                        ),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 18,
+                                      ),
+                                    ),
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.5,
+                                    ),
+                                    dropdownColor: isDark
+                                        ? const Color(0xFF1E293B)
+                                        : Colors.white,
+                                    iconEnabledColor: isDark
+                                        ? Colors.white70
+                                        : const Color(0xFF64748B),
+                                    items: [
+                                      const DropdownMenuItem<String>(
+                                        value: null,
+                                        child: Text('選択してください'),
+                                      ),
+                                      ...getPortsByPrefectureAndCity(_selectedPrefecture, _selectedCity)
+                                          .map((String port) {
+                                        return DropdownMenuItem<String>(
+                                          value: port,
+                                          child: Text(port),
+                                        );
+                                      }),
+                                    ],
+                                    onChanged: (_selectedPrefecture == null || _selectedCity == null)
+                                        ? null
+                                        : (String? value) {
+                                            setState(() {
+                                              _selectedPort = value;
+                                            });
+                                          },
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF3B82F6),
-                              width: 2,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 18,
-                          ),
+                          ],
                         ),
-                        onSubmitted: (_) => _convertFishName(),
-                      ),
-                      const SizedBox(height: 16),
-                      // 市区町村名入力
-                      TextField(
-                        controller: _cityController,
-                        style: TextStyle(
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: '市区町村名',
-                          hintText: '例：福岡市',
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white38
-                                : const Color(0xFF94A3B8),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          labelStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white70
-                                : const Color(0xFF64748B),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          filled: true,
-                          fillColor: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : const Color(0xFFF8FAFC),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.1)
-                                  : const Color(0xFFE2E8F0),
-                              width: 1.5,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF3B82F6),
-                              width: 2,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 18,
-                          ),
-                        ),
-                        onSubmitted: (_) => _convertFishName(),
-                      ),
-                      const SizedBox(height: 16),
-                      // 漁港名入力
-                      TextField(
-                        controller: _portController,
-                        style: TextStyle(
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: '漁港名',
-                          hintText: '例：博多港',
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white38
-                                : const Color(0xFF94A3B8),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          labelStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white70
-                                : const Color(0xFF64748B),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          filled: true,
-                          fillColor: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : const Color(0xFFF8FAFC),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.1)
-                                  : const Color(0xFFE2E8F0),
-                              width: 1.5,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF3B82F6),
-                              width: 2,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 18,
-                          ),
-                        ),
-                        onSubmitted: (_) => _convertFishName(),
                       ),
                       const SizedBox(height: 20),
 
