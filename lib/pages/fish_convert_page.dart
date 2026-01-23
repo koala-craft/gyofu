@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gyofu/data/fish_repository.dart';
 import 'package:gyofu/data/prefecture_data.dart';
 import 'package:gyofu/data/city_port_data.dart';
+import 'package:gyofu/data/regional_fish_mock.dart';
 
 class FishConvertPage extends StatefulWidget {
   const FishConvertPage({super.key});
@@ -21,6 +22,7 @@ class _FishConvertPageState extends State<FishConvertPage>
   String? _selectedPort;
   String _inputText = '';
   String _result = '';
+  List<RegionalFish> _multipleResults = []; // 複数結果を保持
   bool _isRegionExpanded = false; // 地域情報の折りたたみ状態
   final repo = FishRepository();
 
@@ -77,16 +79,29 @@ class _FishConvertPageState extends State<FishConvertPage>
 
       if (!mounted) return;
       
+      // 複数結果を取得
+      final results = repo.convertMultiple(
+        fishName,
+        prefecture: prefecture,
+        city: city,
+        port: port,
+      );
+      
       setState(() {
-        _result = repo.convert(
-          fishName,
-          prefecture: prefecture,
-          city: city,
-          port: port,
-        );
+        _multipleResults = results;
+        
+        // 結果に応じてメッセージを設定
+        if (results.isEmpty) {
+          _result = '該当する魚が見つかりません';
+        } else if (results.length == 1) {
+          _result = results.first.formalName;
+        } else {
+          // 複数件ヒット時は地域入力を促す
+          _result = '';
+        }
       });
 
-      if (_result.isNotEmpty && mounted) {
+      if (mounted) {
         _animationController.forward(from: 0);
       }
     } catch (e) {
@@ -309,6 +324,8 @@ class _FishConvertPageState extends State<FishConvertPage>
                           dividerColor: Colors.transparent,
                         ),
                         child: ExpansionTile(
+                          key: ValueKey(_isRegionExpanded), // 状態変更時に再構築
+                          initiallyExpanded: _isRegionExpanded,
                           tilePadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 8,
@@ -685,6 +702,220 @@ class _FishConvertPageState extends State<FishConvertPage>
               AnimatedBuilder(
                 animation: _fadeAnimation,
                 builder: (context, child) {
+                  // 複数結果がある場合
+                  if (_multipleResults.length > 1) {
+                    return Opacity(
+                      opacity: _fadeAnimation.value,
+                      child: Transform.translate(
+                        offset: Offset(
+                          0,
+                          20 * (1 - _fadeAnimation.value),
+                        ),
+                        child: Column(
+                          children: [
+                            // 注意メッセージ
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFF4E6),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFFFF9800).withOpacity(0.3),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline_rounded,
+                                    color: const Color(0xFFFF9800),
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'この名称は複数の魚を指す可能性があります',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFFE65100),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '地域を指定すると精度が上がります',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: const Color(0xFFEF6C00),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // 複数結果の一覧
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF1E293B).withOpacity(0.6)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: const Color(0xFF3B82F6).withOpacity(0.3),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: isDark
+                                        ? Colors.black.withOpacity(0.2)
+                                        : Colors.black.withOpacity(0.03),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF3B82F6).withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Icon(
+                                          Icons.list_rounded,
+                                          color: const Color(0xFF3B82F6),
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        '候補一覧 (${_multipleResults.length}件)',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark
+                                              ? Colors.white70
+                                              : const Color(0xFF64748B),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ..._multipleResults.map((fish) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? Colors.white.withOpacity(0.05)
+                                            : const Color(0xFFF8FAFC),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.1)
+                                              : const Color(0xFFE2E8F0),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            fish.formalName,
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w700,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF1E293B),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.location_on_outlined,
+                                                size: 16,
+                                                color: const Color(0xFF3B82F6),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                '${fish.prefecture} / ${fish.city}',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: isDark
+                                                      ? Colors.white70
+                                                      : const Color(0xFF64748B),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          if (fish.port != null && fish.port!.isNotEmpty) ...[
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.anchor_outlined,
+                                                  size: 16,
+                                                  color: const Color(0xFF3B82F6),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  fish.port!,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: isDark
+                                                        ? Colors.white60
+                                                        : const Color(0xFF94A3B8),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                          if (fish.notes != null && fish.notes!.isNotEmpty) ...[
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              fish.notes!,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                color: isDark
+                                                    ? Colors.white54
+                                                    : const Color(0xFF94A3B8),
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  
+                  // 単一結果またはエラーの場合
                   if (_result.isEmpty) {
                     return const SizedBox.shrink();
                   }
