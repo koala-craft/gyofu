@@ -140,209 +140,174 @@ class _FishConvertPageState extends State<FishConvertPage>
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF0A0E27),
-                  const Color(0xFF1A1F3A),
-                ]
-              : [
-                  const Color(0xFFF8FAFC),
-                  const Color(0xFFF1F5F9),
-                ],
-        ),
-      ),
+      color: isDark ? const Color(0xFF0A0E27) : Colors.white,
       child: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: size.width * 0.06,
-            vertical: size.height * 0.04,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ヘッダー
-              FadeIn(
-                delay: 0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '魚名変換',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.5,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
-                        height: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'ローカル名から正式名称を検索',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: isDark
-                            ? Colors.white70
-                            : const Color(0xFF64748B),
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ],
+        child: Column(
+          children: [
+            // ヘッダー（一覧画面と同じスタイル）
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF1E293B).withOpacity(0.8)
+                    : Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.1)
+                        : const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
                 ),
               ),
-
-              SizedBox(height: size.height * 0.06),
-
-              // 入力カード
-              FadeIn(
-                delay: 100,
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF1E293B).withOpacity(0.6)
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark
-                            ? Colors.black.withOpacity(0.3)
-                            : Colors.black.withOpacity(0.04),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                        spreadRadius: 0,
-                      ),
-                    ],
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.transparent,
-                      width: 1,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E88E5).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.swap_horiz,
+                      color: Color(0xFF1E88E5),
+                      size: 20,
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(width: 12),
+                  Text(
+                    '魚名変換',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // コンテンツ
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF3B82F6).withOpacity(0.2)
-                                  : const Color(0xFF3B82F6).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
+                      // 魚名入力
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF1E88E5).withOpacity(0.08),
+                              blurRadius: 12,
+                              offset: const Offset(0, 2),
                             ),
-                            child: Icon(
-                              Icons.search_rounded,
-                              color: const Color(0xFF3B82F6),
-                              size: 20,
-                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: _fishNameController,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            height: 1.4,
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '魚の情報を入力',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.3,
+                          decoration: InputDecoration(
+                            labelText: '魚の名前',
+                            hintText: 'ハマチ',
+                            hintStyle: TextStyle(
+                              color: isDark
+                                  ? Colors.white38
+                                  : const Color(0xFF94A3B8),
+                              fontSize: 18,
+                            ),
+                            labelStyle: TextStyle(
                               color: isDark
                                   ? Colors.white70
-                                  : const Color(0xFF64748B),
+                                  : const Color(0xFF1E88E5),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            filled: true,
+                            fillColor: isDark
+                                ? Colors.white.withOpacity(0.08)
+                                : Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.2)
+                                    : const Color(0xFF1E88E5).withOpacity(0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.2)
+                                    : const Color(0xFF1E88E5).withOpacity(0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF1E88E5),
+                                width: 2.5,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 18,
                             ),
                           ),
-                        ],
+                          onChanged: (_) => _updateInputState(),
+                          onSubmitted: (_) => _convertFishName(),
+                        ),
                       ),
                       const SizedBox(height: 20),
-                      // 魚名入力
-                      TextField(
-                        controller: _fishNameController,
-                        style: TextStyle(
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: '魚名',
-                          hintText: '例：ハマチ',
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white38
-                                : const Color(0xFF94A3B8),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          labelStyle: TextStyle(
-                            color: isDark
-                                ? Colors.white70
-                                : const Color(0xFF64748B),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          filled: true,
-                          fillColor: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : const Color(0xFFF8FAFC),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.1)
-                                  : const Color(0xFFE2E8F0),
-                              width: 1.5,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF3B82F6),
-                              width: 2,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 18,
-                          ),
-                        ),
-                        onChanged: (_) => _updateInputState(),
-                        onSubmitted: (_) => _convertFishName(),
-                      ),
-                      const SizedBox(height: 16),
                       // 地域情報の折りたたみセクション
                       Theme(
                         data: Theme.of(context).copyWith(
                           dividerColor: Colors.transparent,
                         ),
-                        child: ExpansionTile(
-                          key: ValueKey(_isRegionExpanded), // 状態変更時に再構築
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.1)
+                                  : const Color(0xFFE5E7EB),
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ExpansionTile(
+                          key: ValueKey(_isRegionExpanded),
                           initiallyExpanded: _isRegionExpanded,
                           tilePadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 8,
                           ),
-                          childrenPadding: EdgeInsets.zero,
+                          childrenPadding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
                           title: Text(
                             '地域情報（任意）',
                             style: TextStyle(
                               color: isDark
-                                  ? Colors.white70
-                                  : const Color(0xFF64748B),
-                              fontSize: 14,
+                                  ? Colors.white
+                                  : const Color(0xFF0F172A),
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              height: 1.3,
                             ),
                           ),
                           subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.only(top: 6),
                             child: Text(
                               _isRegionExpanded 
                                   ? '地域を指定して検索精度を上げる' 
@@ -350,10 +315,12 @@ class _FishConvertPageState extends State<FishConvertPage>
                                       ? '${_selectedPrefecture ?? ''}${_selectedCity != null ? ' / ${_selectedCity}' : ''}${_selectedPort != null ? ' / ${_selectedPort}' : ''}'
                                       : 'タップして地域を選択',
                               style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
                                 color: isDark
-                                    ? Colors.white38
-                                    : const Color(0xFF94A3B8),
-                                fontSize: 12,
+                                    ? Colors.white60
+                                    : const Color(0xFF64748B),
+                                height: 1.3,
                               ),
                             ),
                           ),
@@ -371,64 +338,65 @@ class _FishConvertPageState extends State<FishConvertPage>
                             });
                           },
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-                              child: Column(
+                              Column(
                                 children: [
                                   // 県名入力
                                   DropdownButtonFormField<String>(
                                     value: _selectedPrefecture,
+                                    isDense: false,
                                     decoration: InputDecoration(
                                       labelText: '県名',
-                                      hintText: '都道府県を選択',
+                                      hintText: '選択してください',
                                       hintStyle: TextStyle(
                                         color: isDark
                                             ? Colors.white38
                                             : const Color(0xFF94A3B8),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w400,
+                                        fontSize: 17,
                                       ),
                                       labelStyle: TextStyle(
                                         color: isDark
                                             ? Colors.white70
                                             : const Color(0xFF64748B),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                       filled: true,
                                       fillColor: isDark
                                           ? Colors.white.withOpacity(0.05)
-                                          : const Color(0xFFF8FAFC),
+                                          : const Color(0xFFF9FAFB),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide(
                                           color: isDark
                                               ? Colors.white.withOpacity(0.1)
-                                              : const Color(0xFFE2E8F0),
-                                          width: 1.5,
+                                              : const Color(0xFFE5E7EB),
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.1)
+                                              : const Color(0xFFE5E7EB),
                                         ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(8),
                                         borderSide: const BorderSide(
-                                          color: Color(0xFF3B82F6),
+                                          color: Color(0xFF1E88E5),
                                           width: 2,
                                         ),
                                       ),
                                       contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 18,
+                                        horizontal: 16,
+                                        vertical: 20,
                                       ),
                                     ),
                                     style: TextStyle(
-                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
-                                      fontSize: 18,
+                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                      fontSize: 17,
                                       fontWeight: FontWeight.w500,
-                                      letterSpacing: 0.5,
+                                      height: 1.5,
                                     ),
                                     dropdownColor: isDark
                                         ? const Color(0xFF1E293B)
@@ -437,9 +405,18 @@ class _FishConvertPageState extends State<FishConvertPage>
                                         ? Colors.white70
                                         : const Color(0xFF64748B),
                                     items: [
-                                      const DropdownMenuItem<String>(
+                                      DropdownMenuItem<String>(
                                         value: null,
-                                        child: Text('選択してください'),
+                                        child: Text(
+                                          '選択してください',
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white60
+                                                : const Color(0xFF64748B),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
                                       ),
                                       ...getPrefecturesFromMock().map((String prefecture) {
                                         return DropdownMenuItem<String>(
@@ -456,61 +433,64 @@ class _FishConvertPageState extends State<FishConvertPage>
                                       });
                                     },
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: 16),
                                   // 市区町村名入力
                                   DropdownButtonFormField<String>(
                                     value: _selectedCity,
+                                    isDense: false,
                                     decoration: InputDecoration(
                                       labelText: '市区町村名',
-                                      hintText: '市区町村を選択',
+                                      hintText: '選択してください',
                                       hintStyle: TextStyle(
                                         color: isDark
                                             ? Colors.white38
                                             : const Color(0xFF94A3B8),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w400,
+                                        fontSize: 17,
                                       ),
                                       labelStyle: TextStyle(
                                         color: isDark
                                             ? Colors.white70
                                             : const Color(0xFF64748B),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                       filled: true,
                                       fillColor: isDark
                                           ? Colors.white.withOpacity(0.05)
-                                          : const Color(0xFFF8FAFC),
+                                          : const Color(0xFFF9FAFB),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide(
                                           color: isDark
                                               ? Colors.white.withOpacity(0.1)
-                                              : const Color(0xFFE2E8F0),
-                                          width: 1.5,
+                                              : const Color(0xFFE5E7EB),
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.1)
+                                              : const Color(0xFFE5E7EB),
                                         ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(8),
                                         borderSide: const BorderSide(
-                                          color: Color(0xFF3B82F6),
+                                          color: Color(0xFF1E88E5),
                                           width: 2,
                                         ),
                                       ),
                                       contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 18,
+                                        horizontal: 16,
+                                        vertical: 20,
                                       ),
                                     ),
                                     style: TextStyle(
-                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
-                                      fontSize: 18,
+                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                      fontSize: 17,
                                       fontWeight: FontWeight.w500,
-                                      letterSpacing: 0.5,
+                                      height: 1.5,
                                     ),
                                     dropdownColor: isDark
                                         ? const Color(0xFF1E293B)
@@ -519,9 +499,18 @@ class _FishConvertPageState extends State<FishConvertPage>
                                         ? Colors.white70
                                         : const Color(0xFF64748B),
                                     items: [
-                                      const DropdownMenuItem<String>(
+                                      DropdownMenuItem<String>(
                                         value: null,
-                                        child: Text('選択してください'),
+                                        child: Text(
+                                          '選択してください',
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white60
+                                                : const Color(0xFF64748B),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
                                       ),
                                       ...getCitiesByPrefecture(_selectedPrefecture)
                                           .map((String city) {
@@ -540,61 +529,64 @@ class _FishConvertPageState extends State<FishConvertPage>
                                             });
                                           },
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: 16),
                                   // 漁港名入力
                                   DropdownButtonFormField<String>(
                                     value: _selectedPort,
+                                    isDense: false,
                                     decoration: InputDecoration(
                                       labelText: '漁港名',
-                                      hintText: '漁港を選択',
+                                      hintText: '選択してください',
                                       hintStyle: TextStyle(
                                         color: isDark
                                             ? Colors.white38
                                             : const Color(0xFF94A3B8),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w400,
+                                        fontSize: 17,
                                       ),
                                       labelStyle: TextStyle(
                                         color: isDark
                                             ? Colors.white70
                                             : const Color(0xFF64748B),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                       filled: true,
                                       fillColor: isDark
                                           ? Colors.white.withOpacity(0.05)
-                                          : const Color(0xFFF8FAFC),
+                                          : const Color(0xFFF9FAFB),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide(
                                           color: isDark
                                               ? Colors.white.withOpacity(0.1)
-                                              : const Color(0xFFE2E8F0),
-                                          width: 1.5,
+                                              : const Color(0xFFE5E7EB),
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: isDark
+                                              ? Colors.white.withOpacity(0.1)
+                                              : const Color(0xFFE5E7EB),
                                         ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(8),
                                         borderSide: const BorderSide(
-                                          color: Color(0xFF3B82F6),
+                                          color: Color(0xFF1E88E5),
                                           width: 2,
                                         ),
                                       ),
                                       contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 18,
+                                        horizontal: 16,
+                                        vertical: 20,
                                       ),
                                     ),
                                     style: TextStyle(
-                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
-                                      fontSize: 18,
+                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                      fontSize: 17,
                                       fontWeight: FontWeight.w500,
-                                      letterSpacing: 0.5,
+                                      height: 1.5,
                                     ),
                                     dropdownColor: isDark
                                         ? const Color(0xFF1E293B)
@@ -603,9 +595,18 @@ class _FishConvertPageState extends State<FishConvertPage>
                                         ? Colors.white70
                                         : const Color(0xFF64748B),
                                     items: [
-                                      const DropdownMenuItem<String>(
+                                      DropdownMenuItem<String>(
                                         value: null,
-                                        child: Text('選択してください'),
+                                        child: Text(
+                                          '選択してください',
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white60
+                                                : const Color(0xFF64748B),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
                                       ),
                                       ...getPortsByPrefectureAndCity(_selectedPrefecture, _selectedCity)
                                           .map((String port) {
@@ -625,104 +626,60 @@ class _FishConvertPageState extends State<FishConvertPage>
                                   ),
                                 ],
                               ),
-                            ),
                           ],
+                        ),
                         ),
                       ),
                       const SizedBox(height: 20),
 
                       // 変換ボタン
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 100),
-                        curve: Curves.easeOut,
+                      SizedBox(
                         width: double.infinity,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: _inputText.isEmpty
-                              ? null
-                              : LinearGradient(
-                                  colors: [
-                                    const Color(0xFF3B82F6),
-                                    const Color(0xFF2563EB),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                          color: _inputText.isEmpty
-                              ? (isDark
-                                  ? Colors.white.withOpacity(0.1)
-                                  : const Color(0xFFE2E8F0))
-                              : null,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: _inputText.isEmpty
-                              ? null
-                              : [
-                                  BoxShadow(
-                                    color: const Color(0xFF3B82F6)
-                                        .withOpacity(0.3),
-                                    blurRadius: 16,
-                                    offset: const Offset(0, 8),
-                                    spreadRadius: 0,
-                                  ),
-                                ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _inputText.isEmpty ? null : _convertFishName,
-                            borderRadius: BorderRadius.circular(16),
-                            splashColor: Colors.white.withOpacity(0.2),
-                            highlightColor: Colors.white.withOpacity(0.1),
-                            child: Center(
-                              child: Text(
-                                '変換する',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
-                                  color: _inputText.isEmpty
-                                      ? (isDark
-                                          ? Colors.white38
-                                          : const Color(0xFF94A3B8))
-                                      : Colors.white,
-                                ),
-                              ),
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: _inputText.isEmpty ? null : _convertFishName,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1E88E5),
+                            disabledBackgroundColor: isDark
+                                ? Colors.white.withOpacity(0.1)
+                                : const Color(0xFFE5E7EB),
+                            foregroundColor: Colors.white,
+                            disabledForegroundColor: isDark
+                                ? Colors.white38
+                                : const Color(0xFF94A3B8),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            '変換する',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
 
-              const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-              // 結果カード
-              AnimatedBuilder(
-                animation: _fadeAnimation,
-                builder: (context, child) {
-                  // 複数結果がある場合
-                  if (_multipleResults.length > 1) {
-                    return Opacity(
-                      opacity: _fadeAnimation.value,
-                      child: Transform.translate(
-                        offset: Offset(
-                          0,
-                          20 * (1 - _fadeAnimation.value),
-                        ),
-                        child: Column(
+                      // 結果表示
+                      if (_result.isNotEmpty || _multipleResults.length > 1)
+                        Column(
                           children: [
+                  // 複数結果がある場合
+                  if (_multipleResults.length > 1) ...[
                             // 注意メッセージ
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFF4E6),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: const Color(0xFFFF9800).withOpacity(0.3),
-                                  width: 1.5,
+                                  width: 1,
                                 ),
                               ),
                               child: Row(
@@ -760,74 +717,50 @@ class _FishConvertPageState extends State<FishConvertPage>
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 12),
                             // 複数結果の一覧
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: isDark
                                     ? const Color(0xFF1E293B).withOpacity(0.6)
                                     : Colors.white,
-                                borderRadius: BorderRadius.circular(24),
+                                borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: const Color(0xFF3B82F6).withOpacity(0.3),
-                                  width: 1.5,
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.1)
+                                      : const Color(0xFFE5E7EB),
+                                  width: 1,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: isDark
-                                        ? Colors.black.withOpacity(0.2)
-                                        : Colors.black.withOpacity(0.03),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF3B82F6).withOpacity(0.2),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Icon(
-                                          Icons.list_rounded,
-                                          color: const Color(0xFF3B82F6),
-                                          size: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        '候補一覧 (${_multipleResults.length}件)',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: isDark
-                                              ? Colors.white70
-                                              : const Color(0xFF64748B),
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    '候補一覧 (${_multipleResults.length}件)',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF0F172A),
+                                    ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 12),
                                   ..._multipleResults.map((fish) {
                                     return Container(
-                                      margin: const EdgeInsets.only(bottom: 12),
-                                      padding: const EdgeInsets.all(16),
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
                                         color: isDark
                                             ? Colors.white.withOpacity(0.05)
-                                            : const Color(0xFFF8FAFC),
-                                        borderRadius: BorderRadius.circular(12),
+                                            : const Color(0xFFF9FAFB),
+                                        borderRadius: BorderRadius.circular(8),
                                         border: Border.all(
                                           color: isDark
                                               ? Colors.white.withOpacity(0.1)
-                                              : const Color(0xFFE2E8F0),
+                                              : const Color(0xFFE5E7EB),
                                           width: 1,
                                         ),
                                       ),
@@ -837,14 +770,14 @@ class _FishConvertPageState extends State<FishConvertPage>
                                           Text(
                                             fish.formalName,
                                             style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w700,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w600,
                                               color: isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF1E293B),
+                                                  : const Color(0xFF0F172A),
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
+                                          const SizedBox(height: 6),
                                           Row(
                                             children: [
                                               Icon(
@@ -909,135 +842,71 @@ class _FishConvertPageState extends State<FishConvertPage>
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
+                  ],
                   
                   // 単一結果またはエラーの場合
-                  if (_result.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-
-                  final isError =
-                      _result == '該当する魚が見つかりません';
-
-                  return Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: Transform.translate(
-                      offset: Offset(
-                        0,
-                        20 * (1 - _fadeAnimation.value),
-                      ),
-                      child: FadeIn(
-                        delay: 0,
-                        child: Container(
+                  if (_result.isNotEmpty && _multipleResults.length <= 1)
+                      Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            gradient: isError
-                                ? null
-                                : LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      const Color(0xFF3B82F6).withOpacity(0.1),
-                                      const Color(0xFF2563EB).withOpacity(0.05),
-                                    ],
-                                  ),
-                            color: isError
+                            color: _result == '該当する魚が見つかりません'
                                 ? (isDark
                                     ? const Color(0xFF7F1D1D).withOpacity(0.3)
                                     : const Color(0xFFFEF2F2))
-                                : null,
-                            borderRadius: BorderRadius.circular(24),
+                                : (isDark
+                                    ? const Color(0xFF1E293B).withOpacity(0.6)
+                                    : const Color(0xFFF0F9FF)),
+                            borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: isError
+                              color: _result == '該当する魚が見つかりません'
                                   ? (isDark
                                       ? Colors.red.withOpacity(0.3)
                                       : const Color(0xFFFEE2E2))
                                   : (isDark
-                                      ? const Color(0xFF3B82F6).withOpacity(0.3)
-                                      : const Color(0xFFDBEAFE)),
-                              width: 1.5,
+                                      ? Colors.white.withOpacity(0.1)
+                                      : const Color(0xFFBFDBFE)),
+                              width: 1,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDark
-                                    ? Colors.black.withOpacity(0.2)
-                                    : Colors.black.withOpacity(0.03),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
-                                spreadRadius: 0,
-                              ),
-                            ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: isError
-                                          ? Colors.red.withOpacity(0.2)
-                                          : const Color(0xFF3B82F6)
-                                              .withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      isError
-                                          ? Icons.error_outline_rounded
-                                          : Icons.check_circle_outline_rounded,
-                                      color: isError
-                                          ? Colors.red
-                                          : const Color(0xFF3B82F6),
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    isError ? '見つかりませんでした' : '正式名称',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.3,
-                                      color: isError
-                                          ? Colors.red
-                                          : (isDark
-                                              ? Colors.white70
-                                              : const Color(0xFF64748B)),
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                _result == '該当する魚が見つかりません' ? '見つかりませんでした' : '正式名称',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: _result == '該当する魚が見つかりません'
+                                      ? Colors.red
+                                      : (isDark
+                                          ? Colors.white70
+                                          : const Color(0xFF64748B)),
+                                ),
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 8),
                               Text(
                                 _result,
                                 style: TextStyle(
-                                  fontSize: 28,
+                                  fontSize: 24,
                                   fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
-                                  color: isError
+                                  color: _result == '該当する魚が見つかりません'
                                       ? Colors.red
                                       : (isDark
                                           ? Colors.white
-                                          : const Color(0xFF1E293B)),
-                                  height: 1.3,
+                                          : const Color(0xFF0F172A)),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
+                          ],
+                        ),
+                    ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

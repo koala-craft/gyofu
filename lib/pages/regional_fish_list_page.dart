@@ -59,21 +59,7 @@ class _RegionalFishListPageState extends State<RegionalFishListPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF0A0E27),
-                  const Color(0xFF1A1F3A),
-                ]
-              : [
-                  const Color(0xFFF8FAFC),
-                  const Color(0xFFF1F5F9),
-                ],
-        ),
-      ),
+      color: isDark ? const Color(0xFF0A0E27) : Colors.white,
       child: SafeArea(
         child: Stack(
           children: [
@@ -88,22 +74,12 @@ class _RegionalFishListPageState extends State<RegionalFishListPage> {
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF1E293B).withOpacity(0.8)
-                        : Colors.white.withOpacity(0.9),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark
-                            ? Colors.black.withOpacity(0.2)
-                            : Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                        spreadRadius: 0,
-                      ),
-                    ],
+                        : Colors.white,
                     border: Border(
                       bottom: BorderSide(
                         color: isDark
                             ? Colors.white.withOpacity(0.1)
-                            : const Color(0xFFE2E8F0),
+                            : const Color(0xFFE5E7EB),
                         width: 1,
                       ),
                     ),
@@ -199,10 +175,7 @@ class _RegionalFishListPageState extends State<RegionalFishListPage> {
                           ),
                         )
                       : ListView.builder(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: size.width * 0.06,
-                            vertical: 8,
-                          ),
+                          padding: EdgeInsets.zero,
                           itemCount: _filteredFish.length,
                           itemBuilder: (context, index) {
                             final fish = _filteredFish[index];
@@ -254,82 +227,70 @@ class _FishListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF1E293B).withOpacity(0.6)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark
-                      ? Colors.black.withOpacity(0.3)
-                      : Colors.black.withOpacity(0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 0,
-                ),
-              ],
-              border: Border.all(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isDark
+                ? const Color(0xFF1E293B).withOpacity(0.6)
+                : Colors.white,
+            border: Border(
+              bottom: BorderSide(
                 color: isDark
                     ? Colors.white.withOpacity(0.1)
-                    : Colors.transparent,
+                    : const Color(0xFFE5E7EB),
                 width: 1,
               ),
             ),
-            child: Row(
-              children: [
-                // アイコン
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF3B82F6).withOpacity(0.2)
-                        : const Color(0xFF3B82F6).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.set_meal,
-                    color: Color(0xFF3B82F6),
-                    size: 24,
-                  ),
+          ),
+          child: Row(
+            children: [
+              // アイコン
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF3B82F6).withOpacity(0.2)
+                      : const Color(0xFF3B82F6).withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 16),
+                child: const Icon(
+                  Icons.set_meal,
+                  color: Color(0xFF3B82F6),
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
 
-                // 情報
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        fish.localName,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
-                          letterSpacing: 0.3,
-                        ),
+              // 情報
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fish.localName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        letterSpacing: 0.2,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '正式名称: ${fish.formalName}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: isDark
-                              ? Colors.white70
-                              : const Color(0xFF64748B),
-                          letterSpacing: 0.2,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '正式名称: ${fish.formalName}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: isDark
+                            ? Colors.white70
+                            : const Color(0xFF64748B),
+                        letterSpacing: 0.2,
                       ),
+                    ),
                       const SizedBox(height: 4),
                       Text(
                         '${fish.prefecture} ${fish.city}',
@@ -362,13 +323,13 @@ class _FishListItem extends StatelessWidget {
                   ),
                 ),
 
-                // 矢印アイコン
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
-                ),
-              ],
-            ),
+              // 矢印アイコン
+              Icon(
+                Icons.chevron_right_rounded,
+                color: isDark ? Colors.white38 : const Color(0xFFD1D5DB),
+                size: 20,
+              ),
+            ],
           ),
         ),
       ),

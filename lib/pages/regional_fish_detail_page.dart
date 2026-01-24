@@ -36,82 +36,60 @@ class RegionalFishDetailPage extends StatelessWidget {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF0A0E27),
-                  const Color(0xFF1A1F3A),
-                ]
-              : [
-                  const Color(0xFFF8FAFC),
-                  const Color(0xFFF1F5F9),
-                ],
-        ),
-      ),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: size.width * 0.06,
-            vertical: size.height * 0.04,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ヘッダー
-              Row(
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0A0E27) : Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ヘッダー（一覧画面と同じスタイル）
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF1E293B).withOpacity(0.8)
+                    : Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.1)
+                        : const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
                 children: [
                   IconButton(
                     onPressed: () => context.pop(),
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.arrow_back_rounded,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: Color(0xFF1E88E5),
+                      size: 24,
                     ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
-                  Expanded(
-                    child: Text(
-                      '魚の詳細情報',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.5,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
-                      ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '魚詳細情報',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 24),
-
-              // 詳細カード
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF1E293B).withOpacity(0.6)
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withOpacity(0.3)
-                          : Colors.black.withOpacity(0.04),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                      spreadRadius: 0,
-                    ),
-                  ],
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.transparent,
-                    width: 1,
-                  ),
-                ),
+            // コンテンツ
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -119,20 +97,20 @@ class RegionalFishDetailPage extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF3B82F6).withOpacity(0.2)
-                                : const Color(0xFF3B82F6).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
+                                : const Color(0xFF3B82F6).withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
                             Icons.set_meal,
                             color: Color(0xFF3B82F6),
-                            size: 32,
+                            size: 28,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,20 +118,20 @@ class RegionalFishDetailPage extends StatelessWidget {
                               Text(
                                 fish.localName,
                                 style: TextStyle(
-                                  fontSize: 28,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
+                                  letterSpacing: 0.2,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF1E293B),
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '正式名称: ${fish.formalName}',
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w400,
                                   color: isDark
                                       ? Colors.white70
                                       : const Color(0xFF64748B),
@@ -165,7 +143,7 @@ class RegionalFishDetailPage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
                     // 地域情報
                     _DetailItem(
@@ -191,14 +169,20 @@ class RegionalFishDetailPage extends StatelessWidget {
                       ),
                     ],
                     if (fish.notes != null && fish.notes!.isNotEmpty) ...[
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isDark
                               ? Colors.white.withOpacity(0.05)
-                              : const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(12),
+                              : const Color(0xFFF9FAFB),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white.withOpacity(0.1)
+                                : const Color(0xFFE5E7EB),
+                            width: 1,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,8 +228,8 @@ class RegionalFishDetailPage extends StatelessWidget {
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -284,19 +268,19 @@ class _DetailItem extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   color: isDark ? Colors.white70 : const Color(0xFF64748B),
-                  letterSpacing: 0.3,
+                  letterSpacing: 0.2,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  letterSpacing: 0.3,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  letterSpacing: 0.2,
                 ),
               ),
             ],
